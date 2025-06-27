@@ -1,8 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
-import ScrollFloat from "./ScrollFloat"; // احذف GlitchText إذا لم تستخدمه فعلاً
+import ScrollFloat from "./ScrollFloat";
 import Image from "next/image";
+import React from "react";
+import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 
 const books = [
   {
@@ -10,30 +12,49 @@ const books = [
     title: "Deep Focus Mastery",
     pages: 120,
     price: "$6.99",
-    image: "/books/focus.jpg",
+    image: "https://i.pinimg.com/736x/66/31/65/66316590a7130ee75ed04d831fc4792f.jpg",
   },
   {
     id: 2,
     title: "Build Better Habits",
     pages: 98,
     price: "$4.99",
-    image: "/books/habits.jpg",
+    image: "https://i.pinimg.com/736x/07/57/35/075735c92f640d933e134a36191a0f1d.jpg",
   },
   {
     id: 3,
     title: "Mindset Reset",
     pages: 130,
     price: "$7.99",
-    image: "/books/mindset.jpg",
+    image: "https://i.pinimg.com/736x/d0/41/fc/d041fc6aaf37a5dcb488d9a4be5cf2e4.jpg",
   },
 ];
+
+const AceternityLogo = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 66 65"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-4 w-4 text-black dark:text-white"
+  >
+    <path
+      d="M8 8.05571C8 8.05571 54.9009 18.1782 57.8687 30.062C60.8365 41.9458 9.05432 57.4696 9.05432 57.4696"
+      stroke="currentColor"
+      strokeWidth="15"
+      strokeMiterlimit="3.86874"
+      strokeLinecap="round"
+    />
+  </svg>
+);
 
 export default function BooksSection() {
   return (
     <section className="bg-white dark:bg-zinc-950 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto text-center">
         {/* العنوان المتحرك */}
-        <ScrollFloat speed={1}>Explore Our Featured Books</ScrollFloat>
+        <ScrollFloat speed={1.2}>Explore Our Featured Books</ScrollFloat>
 
         {/* وصف تسويقي جذاب */}
         <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mt-4 text-base sm:text-lg leading-relaxed">
@@ -46,35 +67,51 @@ export default function BooksSection() {
         </p>
 
         {/* البطاقات */}
-        <div className="grid gap-10 mt-16 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {books.map((book, index) => (
-            <motion.div
+        <div className="grid gap-4 sm:gap-8 lg:gap-16 mt-12 sm:mt-14 lg:mt-16 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {books.map((book) => (
+            <CardContainer
               key={book.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.15 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+              className="inter-var group"
+              containerClassName="hover:scale-105 transition-transform duration-500 ease-out w-full max-w-sm mx-auto lg:max-w-md"
             >
-              <Image
-                src={book.image}
-                alt={book.title}
-                width={400}
-                height={256}
-                className="w-full h-56 object-cover sm:h-64 md:h-60"
-              />
-              <div className="p-6 text-left">
-                <h3 className="text-lg font-bold text-zinc-800 dark:text-white mb-2">
+              <CardBody className="bg-white dark:bg-zinc-900/90 relative border border-indigo-100 dark:border-indigo-900/50 w-full rounded-2xl p-6 sm:p-8 shadow-lg group-hover:shadow-[0_8px_30px_rgba(76,81,191,0.2)] dark:group-hover:shadow-[0_8px_30px_rgba(127,156,245,0.25)] transition-all duration-500">
+                <CardItem
+                  translateZ="60"
+                  className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight"
+                >
                   {book.title}
-                </h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
-                  {book.pages} pages &nbsp;•&nbsp; {book.price}
-                </p>
-                <button className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-300">
-                  View Book
-                </button>
-              </div>
-            </motion.div>
+                </CardItem>
+                <CardItem
+                  as="p"
+                  translateZ="50"
+                  className="text-zinc-500 dark:text-zinc-400 text-sm sm:text-base mt-2"
+                >
+                  {book.pages} pages • {book.price}
+                </CardItem>
+                <CardItem translateZ="80" className="w-full mt-6">
+                  <Image
+                    src={book.image}
+                    alt={book.title}
+                    width={800}
+                    height={600}
+                    className="rounded-xl object-cover w-full h-64 sm:h-72 lg:h-80 shadow-md group-hover:shadow-[0_4px_15px_rgba(76,81,191,0.3)] transition-shadow duration-300"
+                    priority
+                  />
+                </CardItem>
+                <div className="mt-8 flex justify-center">
+                  <HoverBorderGradient
+                    containerClassName="rounded-full"
+                    className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white flex items-center space-x-2 px-6 py-3 text-sm sm:text-base font-semibold tracking-tight"
+                    primaryColor="#4c51bf"
+                    secondaryColor="#7f9cf5"
+                    glowIntensity={0.7}
+                  >
+                    <AceternityLogo />
+                    <span>View Book</span>
+                  </HoverBorderGradient>
+                </div>
+              </CardBody>
+            </CardContainer>
           ))}
         </div>
       </div>
