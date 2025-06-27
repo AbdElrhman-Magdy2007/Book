@@ -78,10 +78,10 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute top-0 left-0 w-full h-screen bg-indigo-950/90 backdrop-blur-2xl z-40 flex flex-col items-center justify-center gap-6 md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="text-center absolute top-16 inset-x-0 mx-auto w-[90%] bg-indigo-950/70 border border-white/10 backdrop-blur-xl rounded-xl py-4 px-6 flex flex-col gap-4 md:hidden"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
           >
             {navItems.map((item) => (
@@ -90,26 +90,25 @@ export default function Navbar() {
                 href={item.href}
                 onClick={() => setIsOpen(false)}
                 className={clsx(
-                  'text-white text-lg font-medium',
-                  pathname === item.href ? 'underline underline-offset-4' : ''
+                  "text-white text-sm font-medium py-1",
+                  pathname === item.href ? "underline underline-offset-4" : ""
                 )}
               >
                 {item.name}
               </Link>
             ))}
-
-            <div className="flex flex-col gap-3 pt-6">
+            <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
               <Link
                 href="/login"
                 onClick={() => setIsOpen(false)}
-                className="text-sm text-indigo-200 hover:text-white transition"
+                className="text-sm text-gray-300 hover:text-white transition"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
                 onClick={() => setIsOpen(false)}
-                className="text-sm text-white bg-indigo-700 hover:bg-indigo-600 px-6 py-2 rounded-md border border-indigo-600 text-center"
+                className="text-sm text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-md border border-white/20 text-center"
               >
                 Sign Up
               </Link>
