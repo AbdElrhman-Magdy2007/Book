@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import ScrollFloat from "./ScrollFloat"; // احذف GlitchText إذا لم تستخدمه فعلاً
+import Image from "next/image";
 
 const books = [
   {
@@ -31,22 +32,13 @@ export default function BooksSection() {
   return (
     <section className="bg-white dark:bg-zinc-950 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto text-center">
-
         {/* العنوان المتحرك */}
-        <ScrollFloat
-          animationDuration={1}
-          ease="back.out(1.7)"
-          scrollStart="top 80%"
-          scrollEnd="bottom 20%"
-          stagger={0.03}
-        >
-          Explore Our Featured Books
-        </ScrollFloat>
+        <ScrollFloat speed={1}>Explore Our Featured Books</ScrollFloat>
 
         {/* وصف تسويقي جذاب */}
         <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mt-4 text-base sm:text-lg leading-relaxed">
-          Discover beautifully crafted digital books that boost clarity, enhance your habits, and elevate your thinking —
-          starting from&nbsp;
+          Discover beautifully crafted digital books that boost clarity, enhance
+          your habits, and elevate your thinking — starting from&nbsp;
           <span className="font-semibold text-indigo-600 dark:text-indigo-400">
             just $1
           </span>
@@ -64,9 +56,11 @@ export default function BooksSection() {
               viewport={{ once: true }}
               className="bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
             >
-              <img
+              <Image
                 src={book.image}
                 alt={book.title}
+                width={400}
+                height={256}
                 className="w-full h-56 object-cover sm:h-64 md:h-60"
               />
               <div className="p-6 text-left">

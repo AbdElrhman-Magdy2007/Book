@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -31,37 +31,16 @@ export const InfiniteMovingCards: React.FC<InfiniteMovingCardsProps> = ({
   const [start, setStart] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  useEffect(() => {
-    addAnimation();
-    return () => {
-      controls.stop();
-    };
-  }, []);
-
-  const addAnimation = () => {
-    if (containerRef.current && scrollerRef.current) {
-      const scrollerContent = Array.from(scrollerRef.current.children);
-      scrollerContent.forEach((item) => {
-        const duplicatedItem = item.cloneNode(true);
-        scrollerRef.current!.appendChild(duplicatedItem);
-      });
-
-      applyDirection();
-      applySpeed();
-      setStart(true);
-    }
-  };
-
-  const applyDirection = () => {
+  const applyDirection = useCallback(() => {
     if (containerRef.current) {
       containerRef.current.style.setProperty(
         "--animation-direction",
         direction === "left" ? "forwards" : "reverse"
       );
     }
-  };
+  }, [direction]);
 
-  const applySpeed = () => {
+  const applySpeed = useCallback(() => {
     if (containerRef.current) {
       const speeds = {
         fast: "20s",
@@ -73,7 +52,28 @@ export const InfiniteMovingCards: React.FC<InfiniteMovingCardsProps> = ({
         speeds[speed]
       );
     }
-  };
+  }, [speed]);
+
+  const addAnimation = useCallback(() => {
+    if (containerRef.current && scrollerRef.current) {
+      const scrollerContent = Array.from(scrollerRef.current.children);
+      scrollerContent.forEach((item) => {
+        const duplicatedItem = item.cloneNode(true);
+        scrollerRef.current!.appendChild(duplicatedItem);
+      });
+
+      applyDirection();
+      applySpeed();
+      setStart(true);
+    }
+  }, [applyDirection, applySpeed]);
+
+  useEffect(() => {
+    addAnimation();
+    return () => {
+      controls.stop();
+    };
+  }, [addAnimation, controls]);
 
   const handleMouseEnter = () => {
     if (pauseOnHover) {
@@ -91,8 +91,7 @@ export const InfiniteMovingCards: React.FC<InfiniteMovingCardsProps> = ({
           x: {
             repeat: Infinity,
             repeatType: "loop",
-            duration:
-              speed === "fast" ? 20 : speed === "normal" ? 40 : 80,
+            duration: speed === "fast" ? 20 : speed === "normal" ? 40 : 80,
             ease: "linear",
           },
         },
@@ -135,7 +134,6 @@ export const InfiniteMovingCards: React.FC<InfiniteMovingCardsProps> = ({
                 {item.quote}
               </span>
               <div className="relative z-10 mt-6 flex items-center gap-4">
-            
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-semibold text-gray-900 dark:text-gray-200">
                     {item.name}
