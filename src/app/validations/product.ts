@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { PackageOption } from "@prisma/client";
 
 // Centralized error messages for user-friendly feedback
 export const errorMessages = {
@@ -7,14 +6,23 @@ export const errorMessages = {
   requiredDescription: "Product description is required",
   requiredCategory: "Category is required",
   requiredImage: "Product image is required",
-  invalidImage: "Image must be a valid file (JPEG, PNG, GIF, WebP, SVG, BMP) under 15MB",
+  invalidImage:
+    "Image must be a valid file (JPEG, PNG, GIF, WebP, SVG, BMP) under 15MB",
   requiredTech: "At least one technology is required",
   invalidTech: "Technology name is required",
   requiredAddon: "Exactly one addon is required",
-  invalidAddon: "Addon must be a valid package option (FullStack, Backend, Frontend, UI, UX)",
+  invalidAddon:
+    "Addon must be a valid package option (FullStack, Backend, Frontend, UI, UX)",
+  requiredBeneficiary: "Beneficiary is required",
+  invalidBeneficiary: "Beneficiary must be a valid beneficiary",
+  beneficiaryMaxLength: "Beneficiary must be less than 100 characters",
+  beneficiaryMinLength: "Beneficiary must be at least 3 characters",
+  beneficiary: "Make sure to write the beneficiary",
   tooManyAddons: "Only one addon is allowed",
-  invalidLiveDemoLink: "Live demo link must be a valid URL",
-  invalidGitHubLink: "GitHub link must be a valid GitHub repository URL (e.g., https://github.com/user/repo)",
+  requiredPrice: "Price is required",
+  invalidPrice: "Price must be a positive number",
+  invalidGitHubLink:
+    "GitHub link must be a valid GitHub repository URL (e.g., https://github.com/user/repo)",
 };
 
 // Image validation constants
@@ -51,17 +59,21 @@ const imageValidation = (isRequired: boolean) =>
     .instanceof(File, { message: errorMessages.invalidImage })
     .optional()
     .refine(
-      (file) => (isRequired ? file !== undefined && file !== null && file.size > 0 : true),
+      (file) =>
+        isRequired
+          ? file !== undefined && file !== null && file.size > 0
+          : true,
       { message: errorMessages.requiredImage }
     )
     .refine(
-      (file) => !file || (VALID_IMAGE_TYPES.includes(file.type) && file.size <= MAX_IMAGE_SIZE),
+      (file) =>
+        !file ||
+        (VALID_IMAGE_TYPES.includes(file.type) && file.size <= MAX_IMAGE_SIZE),
       { message: errorMessages.invalidImage }
     );
 
 /**
  * Defines validation schemas for product technologies and addons.
- * @returns Object containing Zod schemas for productTechs and productAddons.
  */
 const getOptionsValidations = () => ({
   productTechs: z
@@ -70,18 +82,7 @@ const getOptionsValidations = () => ({
         name: z.string().trim().min(1, { message: errorMessages.invalidTech }),
       })
     )
-    .min(1, { message: errorMessages.requiredTech })
-    .default([]),
-  productAddons: z
-    .array(
-      z.object({
-        name: z.enum(Object.values(PackageOption) as [string, ...string[]], {
-          message: errorMessages.invalidAddon,
-        }),
-      })
-    )
-    .min(1, { message: errorMessages.requiredAddon })
-    .max(1, { message: errorMessages.tooManyAddons })
+    .optional()
     .default([]),
 });
 
@@ -106,14 +107,10 @@ const getCommonValidations = () => ({
       .min(1, { message: errorMessages.requiredDescription })
       .max(1000, { message: "Description must be less than 1000 characters" })
   ),
-  categoryId: z.string().uuid({ message: errorMessages.requiredCategory }),
-  liveDemoLink: z
+  beneficiary: z
     .string()
-    .optional()
-    .refine(
-      (val) => !val || z.string().url().safeParse(val).success,
-      { message: errorMessages.invalidLiveDemoLink }
-    ),
+    .min(1, { message: errorMessages.requiredBeneficiary }),
+  categoryId: z.string().uuid({ message: errorMessages.requiredCategory }),
   gitHubLink: z
     .string()
     .optional()
@@ -124,7 +121,34 @@ const getCommonValidations = () => ({
           /^https?:\/\/(www\.)?github\.com\/[\w-]+\/[\w-]+(\/.*)?$/.test(val)),
       { message: errorMessages.invalidGitHubLink }
     ),
+  url: z
+    .string({ required_error: "Product URL is required" })
+    .min(1, { message: "Product URL is required" })
+    .refine((val) => /^https?:\/\/.+/.test(val), {
+      message: "The URL must start with http or https and be valid.",
+    }),
+  price: z.preprocess(
+    (val) => (typeof val === "string" ? parseFloat(val) : val),
+    z
+      .number({ invalid_type_error: errorMessages.invalidPrice })
+      .min(0, { message: errorMessages.invalidPrice })
+      .refine((val) => !isNaN(val), { message: errorMessages.invalidPrice })
+      .refine((val) => val !== undefined && val !== null, {
+        message: errorMessages.requiredPrice,
+      })
+  ),
   ...getOptionsValidations(),
+  rating: z.preprocess(
+    (val) => (typeof val === "string" ? parseFloat(val) : val),
+    z
+      .number()
+      .min(0, { message: "Rating must be at least 0" })
+      .max(5, { message: "Rating must be at most 5" })
+      .refine((val) => val * 2 === Math.round(val * 2), {
+        message: "Rating must be in 0.5 steps",
+      })
+      .default(0)
+  ),
 });
 
 /**

@@ -91,12 +91,12 @@ const NavLinks: React.FC<NavLinksProps> = React.memo(
         transition: {
           delay: i * 0.04, // Faster delay for compact animation
           duration: 0.3,
-          ease: "easeOut",
+          ease: "easeOut" as const,
         },
       }),
       hover: {
         scale: 1.08,
-        transition: { duration: 0.2, ease: "easeInOut" },
+        transition: { duration: 0.2, ease: "easeInOut" as const },
       },
     };
 
@@ -156,17 +156,18 @@ const NavLinks: React.FC<NavLinksProps> = React.memo(
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
-                  {/* {item.icon && (
+                  {/* عرض الأيقونة إذا كانت موجودة */}
+                  {item.icon && (
                     <span
                       className={clsx(
-                        'inline-block transform transition-transform duration-200 group-hover:scale-110',
-                        dir === 'rtl' ? 'ml-1.5 sm:ml-2' : 'mr-1.5 sm:mr-2', // Reduced icon spacing
-                        isMobile ? 'text-lg sm:text-xl' : 'text-base sm:text-lg',
+                        "inline-block transform transition-transform duration-200 group-hover:scale-110",
+                        dir === "rtl" ? "ml-1.5 sm:ml-2" : "mr-1.5 sm:mr-2",
+                        isMobile ? "text-lg sm:text-xl" : "text-base sm:text-lg"
                       )}
                     >
                       {item.icon}
                     </span>
-                  )} */}
+                  )}
                   <span className="relative z-10">{item.name}</span>
                   <motion.span
                     className={clsx(

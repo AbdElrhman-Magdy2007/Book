@@ -224,7 +224,7 @@ const LoginForm = memo(() => {
   return (
     <form
       className={clsx(
-        "space-y-6 w-full max-w-md mx-auto p-6 sm:p-8",
+        " w-full max-w-md mx-auto p-6 sm:p-8",
         "glass-card border-gradient animate-glow",
         "transition-all duration-300"
       )}
@@ -232,7 +232,7 @@ const LoginForm = memo(() => {
       ref={formRef}
       dir="ltr"
     >
-      <div className="relative">
+      <div className="relative pb-8">
         {formFields.map((field, index) => (
           <motion.div
             key={field.name || index}

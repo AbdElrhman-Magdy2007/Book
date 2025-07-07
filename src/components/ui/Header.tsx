@@ -1,17 +1,25 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
-import { User } from "lucide-react";
+import { User, Shield } from "lucide-react";
 import Logo from "./header/Logo";
 import NavLinks from "./header/NavLinks";
 import AuthSection from "./header/AuthSection";
 import MobileMenuButton from "./header/MobileMenuButton";
+import { useSession } from "next-auth/react";
+
+interface NavItem {
+  name: string;
+  href: string;
+  icon?: React.ReactNode;
+}
 
 const Header: React.FC = React.memo(() => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 10);
@@ -26,19 +34,47 @@ const Header: React.FC = React.memo(() => {
     setIsMobileMenuOpen((prev) => !prev);
   }, []);
 
-  const navItems = useMemo(
-    () => [
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setIsMobileMenuOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen, handleClickOutside]);
+
+  const { data: session } = useSession();
+
+  const navItems: NavItem[] = useMemo(() => {
+    const items: NavItem[] = [
       { name: "Home", href: "/" },
       { name: "Menu", href: "/menu" },
       { name: "Showcase", href: "/showcase" },
-      {
-        name: "Profile",
-        href: "/profile",
-        icon: <User className="w-4 h-4 inline-block mr-1.5" />,
-      },
-    ],
-    []
-  );
+    ];
+    if (session?.user) {
+      if (session.user.role === "ADMIN") {
+        items.push({
+          name: "Admin",
+          href: "/admin",
+        });
+      } else {
+        items.push({
+          name: "Profile",
+          href: "/profile",
+          icon: <User className="w-4 h-4 inline-block mr-1.5" />,
+        });
+      }
+    }
+    return items;
+  }, [session]);
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -77,19 +113,15 @@ const Header: React.FC = React.memo(() => {
       role="banner"
       aria-label="Main Navigation"
     >
-      {/* ✅ Desktop Navigation */}
       <div className="container mx-auto px-6 hidden md:grid grid-cols-[auto_1fr_auto] items-center gap-4">
-        {/* Logo - Left */}
         <motion.div variants={childVariants} className="justify-self-start">
           <Logo />
         </motion.div>
 
-        {/* NavLinks - Center */}
         <motion.div variants={childVariants} className="justify-self-center">
           <NavLinks navItems={navItems} />
         </motion.div>
 
-        {/* Auth Buttons - Right */}
         <motion.div
           variants={childVariants}
           className="justify-self-end min-w-max"
@@ -98,7 +130,6 @@ const Header: React.FC = React.memo(() => {
         </motion.div>
       </div>
 
-      {/* ✅ Mobile Topbar */}
       <div className="md:hidden flex items-center justify-between px-6">
         <Logo />
         <MobileMenuButton
@@ -109,10 +140,10 @@ const Header: React.FC = React.memo(() => {
         />
       </div>
 
-      {/* ✅ Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
+            ref={menuRef}
             className={clsx(
               "text-center absolute top-16 inset-x-0 mx-auto w-[90%]",
               "bg-indigo-950/70 border border-white/10 backdrop-blur-xl",

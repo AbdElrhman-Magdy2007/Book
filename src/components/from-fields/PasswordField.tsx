@@ -206,7 +206,7 @@ const PasswordField = ({
       "text-left": !locale,
     })} dir={locale ? "rtl" : "ltr"}>
       {label && (
-        <Label htmlFor={name} className="capitalize text-indigo-700">
+        <Label htmlFor={name} className="capitalize text-black">
           {label}
         </Label>
       )}

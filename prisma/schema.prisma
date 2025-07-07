@@ -13,32 +13,24 @@ enum UserRole {
   ADMIN
 }
 
-enum PackageOption {
-  FullStack
-  Backend
-  Frontend
-  UI
-  UX
-}
-
 // Models
 model User {
-  id            String         @id @default(uuid()) // Unique identifier
-  email         String         @unique // User's email for authentication
-  password      String         // Hashed password
-  name          String         // User's full name
-  image         String?        // Optional profile image URL
-  phone         String?        // Optional contact number
-  streetAddress String?        // Optional address
-  postalCode    String?        // Optional postal code
-  role          UserRole       @default(USER) // User role (USER or ADMIN)
-  city          String?        // Optional city
-  country       String?        // Optional country
-  createdAt     DateTime       @default(now()) // Creation timestamp
-  updatedAt     DateTime       @updatedAt // Last update timestamp
-  orders        Order[]        // Orders placed by the user
-  accounts      Account[]      // Authentication accounts (e.g., OAuth)
-  sessions      Session[]      // Active user sessions
+  id            String    @id @default(uuid()) // Unique identifier
+  email         String    @unique // User's email for authentication
+  password      String // Hashed password
+  name          String // User's full name
+  image         String? // Optional profile image URL
+  phone         String? // Optional contact number
+  streetAddress String? // Optional address
+  postalCode    String? // Optional postal code
+  role          UserRole  @default(USER) // User role (USER or ADMIN)
+  city          String? // Optional city
+  country       String? // Optional country
+  createdAt     DateTime  @default(now()) // Creation timestamp
+  updatedAt     DateTime  @updatedAt // Last update timestamp
+  orders        Order[] // Orders placed by the user
+  accounts      Account[] // Authentication accounts (e.g., OAuth)
+  sessions      Session[] // Active user sessions
 
   @@index([email]) // Index for faster email lookups
 }
@@ -46,18 +38,18 @@ model User {
 model Order {
   id            String         @id @default(uuid()) // Unique identifier
   paid          Boolean        @default(false) // Payment status
-  subTotal      Float          // Sum of product prices
-  deliveryFee   Float          // Delivery cost
-  totalPrice    Float          // Total (subTotal + deliveryFee)
-  userEmail     String         // Email for order confirmation
-  phone         String         // Contact number for delivery
-  streetAddress String         // Delivery address
-  postalCode    String         // Postal code
-  city          String         // Delivery city
-  country       String         // Delivery country
+  subTotal      Float // Sum of product prices
+  deliveryFee   Float // Delivery cost
+  totalPrice    Float // Total (subTotal + deliveryFee)
+  userEmail     String // Email for order confirmation
+  phone         String // Contact number for delivery
+  streetAddress String // Delivery address
+  postalCode    String // Postal code
+  city          String // Delivery city
+  country       String // Delivery country
   createdAt     DateTime       @default(now()) // Creation timestamp
   updatedAt     DateTime       @updatedAt // Last update timestamp
-  userId        String         // Foreign key to User
+  userId        String // Foreign key to User
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade) // User who placed the order
   products      OrderProduct[] // Products in the order
 
@@ -66,9 +58,9 @@ model Order {
 
 model OrderProduct {
   id        String  @id @default(uuid()) // Unique identifier
-  quantity  Int     // Number of units ordered
-  productId String  // Foreign key to Product
-  orderId   String  // Foreign key to Order
+  quantity  Int // Number of units ordered
+  productId String // Foreign key to Product
+  orderId   String // Foreign key to Order
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade) // Product details
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade) // Parent order
 
@@ -76,20 +68,22 @@ model OrderProduct {
 }
 
 model Product {
-  id                   String                 @id @default(uuid()) // Unique identifier
-  name                 String                 // Product name
-  description          String                 // Product description
-  image                String                 // Product image URL
-  order                Int                    @default(autoincrement()) // Display order
-  liveDemoLink         String?                // Optional demo link
-  gitHubLink           String?                // Optional GitHub link
-  createdAt            DateTime               @default(now()) // Creation timestamp
-  updatedAt            DateTime               @updatedAt // Last update timestamp
-  categoryId           String                 // Foreign key to Category
-  category             Category               @relation(fields: [categoryId], references: [id], onDelete: Restrict) // Product category
-  ProductAddon         ProductAddon[]         // Addons for the product
-  ProductTech          ProductTech[]          // Technologies used in the product
-  orders               OrderProduct[]         // Orders containing this product
+  id                    String                 @id @default(uuid()) // Unique identifier
+  name                  String // Product name
+  description           String // Product description
+  image                 String // Product image URL
+  order                 Int                    @default(autoincrement()) // Display order
+  beneficiary           String // Product beneficiary
+  price                 Float                  @default(0) // Product price
+  rating                Float                  @default(0) // ⭐ عدد النجوم (0.5 - 5)
+  url                   String? 
+  pages                 Int?                   // <--- Add this line
+  createdAt             DateTime               @default(now()) // Creation timestamp
+  updatedAt             DateTime               @updatedAt // Last update timestamp
+  categoryId            String // Foreign key to Category
+  category              Category               @relation(fields: [categoryId], references: [id], onDelete: Restrict) // Product category
+  ProductTech           ProductTech[] // Technologies used in the product
+  orders                OrderProduct[] // Orders containing this product
   downloadVerifications DownloadVerification[] // Download verifications for the product
 
   @@index([categoryId]) // Index for category-based queries
@@ -97,18 +91,9 @@ model Product {
 
 model ProductTech {
   id        String  @id @default(uuid()) // Unique identifier
-  name      String  // Technology name (e.g., React, TypeScript)
-  productId String  // Foreign key to Product
+  name      String // Technology name (e.g., React, TypeScript)
+  productId String // Foreign key to Product
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade) // Parent product
-
-  @@index([productId]) // Index for product-based queries
-}
-
-model ProductAddon {
-  id        String        @id @default(cuid()) // Unique identifier
-  name      PackageOption // Addon type (e.g., Backend, Frontend)
-  productId String        // Foreign key to Product
-  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade) // Parent product
 
   @@index([productId]) // Index for product-based queries
 }
@@ -123,27 +108,26 @@ model Category {
 }
 
 model DownloadVerification {
-  id        String   @id @default(uuid()) // Unique identifier
-  identifier String   // Verification identifier
-  token     String   @unique // Unique verification token
-  expires   DateTime // Expiration timestamp
-  createdAt DateTime @default(now()) // Creation timestamp
-  productId String   // Foreign key to Product
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // Parent product
+  id         String   @id @default(uuid()) // Unique identifier
+  identifier String // Verification identifier
+  token      String   @unique // Unique verification token
+  expires    DateTime // Expiration timestamp
+  createdAt  DateTime @default(now()) // Creation timestamp
+  productId  String // Foreign key to Product
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // Parent product
 
   @@index([productId, token]) // Composite index for verification queries
 }
 
-
 model Account {
   id                String  @id @default(uuid()) // Unique identifier
-  userId            String  // Foreign key to User
-  type              String  // Account type (e.g., oauth)
-  provider          String  // Provider (e.g., google, github)
-  providerAccountId String  // Provider-specific account ID
+  userId            String // Foreign key to User
+  type              String // Account type (e.g., oauth)
+  provider          String // Provider (e.g., google, github)
+  providerAccountId String // Provider-specific account ID
   refresh_token     String? // Optional refresh token
   access_token      String? // Optional access token
-  expires_at        Int?    // Token expiration time
+  expires_at        Int? // Token expiration time
   token_type        String? // Token type (e.g., Bearer)
   scope             String? // OAuth scopes
   id_token          String? // Optional ID token
@@ -157,7 +141,7 @@ model Account {
 model Session {
   id           String   @id @default(uuid()) // Unique identifier
   sessionToken String   @unique // Unique session token
-  userId       String   // Foreign key to User
+  userId       String // Foreign key to User
   expires      DateTime // Session expiration
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Parent user
 
@@ -166,22 +150,22 @@ model Session {
 
 model ContactSubmission {
   id        Int      @id @default(autoincrement()) // Unique identifier
-  name      String   // Submitter's name
-  email     String   // Submitter's email
-  message   String   // Submission message
+  name      String // Submitter's name
+  email     String // Submitter's email
+  message   String // Submission message
   createdAt DateTime @default(now()) // Creation timestamp
 }
 
 model Project {
   id          Int      @id @default(autoincrement()) // Unique identifier
-  title       String   // Project title
-  description String   // Project description
-  image       String   // Project image URL
+  title       String // Project title
+  description String // Project description
+  image       String // Project image URL
   tags        String[] // Project tags (e.g., ["React", "Node"])
-  demoUrl     String?  // Optional demo URL
-  githubUrl   String?  // Optional GitHub URL
+  demoUrl     String? // Optional demo URL
+  githubUrl   String? // Optional GitHub URL
   featured    Boolean  @default(false) // Featured status
-  category    String   // Project category
+  category    String // Project category
   date        DateTime @default(now()) // Project date
   createdAt   DateTime @default(now()) // Creation timestamp
   updatedAt   DateTime @updatedAt // Last update timestamp
@@ -189,7 +173,7 @@ model Project {
 
 model VerificationRequest {
   id         String   @id @default(uuid()) // Unique identifier
-  identifier String   // Verification identifier
+  identifier String // Verification identifier
   token      String   @unique // Unique verification token
   expires    DateTime // Expiration timestamp
   createdAt  DateTime @default(now()) // Creation timestamp

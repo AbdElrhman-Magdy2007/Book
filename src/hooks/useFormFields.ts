@@ -60,29 +60,29 @@ const fieldConfigs: Record<string, Partial<IFormField>> = {
     placeholder: "Enter product name",
     ariaLabel: "Product name",
   },
-  description:     {
-      label: "Description",
-      name: "description",
-      type: "text",
-      placeholder: "Enter product description",
-      ariaLabel: undefined,
-      pattern: undefined,
-    },
-  liveDemoLink: {
-    label: "Live Demo Link (optional)",
-    name: "liveDemoLink",
-    type: "url",
-    placeholder: "https://example.com",
-    pattern: "^https?://.*",
-    ariaLabel: "Live demo link",
+  description: {
+    label: "Description",
+    name: "description",
+    type: "text",
+    placeholder: "Enter product description",
+    ariaLabel: undefined,
+    pattern: undefined,
   },
-  gitHubLink: {
-    label: "GitHub Link (optional)",
-    name: "gitHubLink",
-    type: "url",
-    placeholder: "https://github.com/user/repo",
-    pattern: "^https?://(www\\.)?github\\.com/[\\w-]+/[\\w-]+",
-    ariaLabel: "GitHub repository link",
+  beneficiary: {
+    // Beneficiary field for product forms: clear, friendly, and accessible
+    label: "Beneficiary",
+    name: "beneficiary",
+    type: "text",
+    placeholder: "Who will benefit from this product?",
+    pattern: undefined,
+    ariaLabel: "Beneficiary",
+  },
+  price: {
+    label: "Product Price",
+    name: "price",
+    type: "number",
+    placeholder: "Enter product price",
+    ariaLabel: "Product price",
   },
 };
 
@@ -133,8 +133,8 @@ const useFormFields = ({ slug }: UseFormFieldsProps) => {
   const addProductFields = (): IFormField[] => [
     { ...fieldConfigs.productName, autoFocus: true } as IFormField,
     { ...fieldConfigs.description } as IFormField,
-    { ...fieldConfigs.liveDemoLink } as IFormField,
-    { ...fieldConfigs.gitHubLink } as IFormField,
+    { ...fieldConfigs.beneficiary } as IFormField,
+    { ...fieldConfigs.price } as IFormField,
   ];
 
   /**

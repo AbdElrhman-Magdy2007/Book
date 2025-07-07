@@ -7,6 +7,7 @@ import Stack from "./Stack";
 import SplitText from "./SplitText";
 import BlurText from "./BlurText";
 import { BookOpen } from "lucide-react"; // أو استخدم أي أيقونة تفضلها
+import { UilBooks } from "@iconscout/react-unicons";
 
 const images = [
   {
@@ -78,24 +79,25 @@ const Hero = () => {
           />
 
           <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-4">
-            <motion.div whileHover={{ scale: 1.05 }}>
+            {/* <motion.div whileHover={{ scale: 1.05 }}>
               <Link
                 href="/get-started"
                 className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition"
               >
                 Get Started
               </Link>
-            </motion.div>
+            </motion.div> */}
 
             <motion.div whileHover={{ scale: 1.05 }}>
               <Link
-                href="/docs"
+                href="/menu"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-md text-indigo-400 border border-indigo-500 bg-black hover:bg-indigo-900 transition"
               >
-                <BookOpen size={18} />
-                Learn More
+                <UilBooks className="w-5 h-5" />
+                View Full Menu
               </Link>
             </motion.div>
+            
           </div>
         </motion.div>
 

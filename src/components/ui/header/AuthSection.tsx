@@ -4,7 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Button } from "../button";
 import { usePathname, useParams, useRouter } from "next/navigation";
 import { Pages, Routes, Languages } from "@/constants/enums";
-import { motion } from "framer-motion";
+import { motion, easeOut } from "framer-motion";
 import clsx from "clsx";
 import { Loader } from "lucide-react";
 import { useCallback, useMemo } from "react";
@@ -26,9 +26,8 @@ interface ButtonConfig {
  * AuthSection component renders a modern, responsive authentication UI with glassmorphism effects
  * and dynamic animations, designed to integrate seamlessly with a modern website
  * @param {AuthSectionProps} props - Component props
- * @returns {JSX.Element} Styled authentication section
  */
-function AuthSection({ onCloseMenu }: AuthSectionProps): JSX.Element {
+function AuthSection({ onCloseMenu }: AuthSectionProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -83,7 +82,7 @@ function AuthSection({ onCloseMenu }: AuthSectionProps): JSX.Element {
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { duration: 0.3, ease: "easeOut" },
+      transition: { duration: 0.3, ease: easeOut },
     },
     hover: { scale: 1.05, transition: { duration: 0.2 } },
     tap: { scale: 0.95 },
@@ -110,7 +109,7 @@ function AuthSection({ onCloseMenu }: AuthSectionProps): JSX.Element {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex items-center justify-center gap-4 p-4"
+        className="flex items-center justify-center gap-2 p-2"
       >
         <Button
           className={clsx(
@@ -137,7 +136,7 @@ function AuthSection({ onCloseMenu }: AuthSectionProps): JSX.Element {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex items-center justify-center gap-4 p-4"
+        className="flex items-center justify-center gap-2 p-2"
       >
         <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
           <Button
