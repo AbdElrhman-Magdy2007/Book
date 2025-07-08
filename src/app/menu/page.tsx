@@ -15,6 +15,9 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping, faBookOpen } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { CheckCircle } from "lucide-react";
 
 // PriceTag component
 const PriceTag: React.FC<{ price: number }> = ({ price }) => {
@@ -104,7 +107,34 @@ const LoadingSkeleton: React.FC = () => (
 // Professional book card component with refined buttons
 const BookCard: React.FC<{ book: any; index: number }> = ({ book, index }) => {
   const [imageError, setImageError] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
   const defaultImage = "/placeholder-book.jpg";
+
+  // Check if already in cart on mount
+  React.useEffect(() => {
+    let isMounted = true;
+    async function checkIfAdded() {
+      try {
+        const res = await fetch("/api/cart");
+        if (!res.ok) return;
+        const items = await res.json();
+        if (
+          isMounted &&
+          Array.isArray(items) &&
+          items.some((item) => item.productId === book.id)
+        ) {
+          setAdded(true);
+        }
+      } catch {}
+    }
+    checkIfAdded();
+    return () => {
+      isMounted = false;
+    };
+  }, [book.id]);
 
   // Render stars based on rating
   const renderStars = (rating: number) => {
@@ -156,6 +186,68 @@ const BookCard: React.FC<{ book: any; index: number }> = ({ book, index }) => {
   };
 
   const handleImageError = () => setImageError(true);
+
+  async function handleAddToCart() {
+    if (adding || added) return;
+    setAdding(true);
+    try {
+      // Validate productId
+      if (!book.id) {
+        toast({
+          title: "Error",
+          description: "Product ID is missing.",
+          variant: "destructive",
+        });
+        setAdding(false);
+        return;
+      }
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: book.id,
+          name: book.name,
+          image: book.image,
+          price: book.price,
+          category:
+            typeof book.category === "object" && book.category !== null
+              ? book.category.name
+              : book.category,
+        }),
+      });
+      if (res.status === 201) {
+        toast({
+          title: "Added to Cart",
+          description: `${book.name} has been added to your cart!`,
+          variant: "default",
+        });
+        setAdded(true);
+        window.dispatchEvent(new Event("cart-updated"));
+      } else if (res.status === 409) {
+        toast({
+          title: "Already in Cart",
+          description: "This product is already in your cart.",
+          variant: "default",
+        });
+        setAdded(true);
+      } else {
+        const data = await res.json();
+        toast({
+          title: "Error",
+          description: data.error || "Failed to add to cart.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add to cart.",
+        variant: "destructive",
+      });
+    } finally {
+      setAdding(false);
+    }
+  }
 
   return (
     <div className="relative group">
@@ -234,9 +326,22 @@ const BookCard: React.FC<{ book: any; index: number }> = ({ book, index }) => {
                 className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-5 py-2.5 rounded-xl border border-indigo-800 shadow-lg hover:shadow-[0_8px_16px_rgba(79,70,229,0.3)] hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200 font-bold text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                disabled={adding || added}
+                onClick={handleAddToCart}
               >
-                <FontAwesomeIcon icon={faCartShopping} className="w-5 h-5" />
-                Add to Cart
+                {added ? (
+                  <>
+                    <CheckCircle className="w-5 h-5 text-white drop-shadow-[0_0_8px_#22c55e] mr-2" />
+                    Added
+                  </>
+                ) : adding ? (
+                  "Adding..."
+                ) : (
+                  <>
+                    <FontAwesomeIcon icon={faCartShopping} className="w-5 h-5" />
+                    Add to Cart
+                  </>
+                )}
               </motion.button>
               <motion.button
                 className="flex-1 flex items-center justify-center gap-2 bg-gray-200 dark:bg-zinc-700 text-indigo-800 dark:text-indigo-100 px-5 py-2.5 rounded-xl border border-gray-300 dark:border-zinc-600 shadow-lg hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:bg-gray-300 dark:hover:bg-zinc-600 transition-all duration-200 font-bold text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:bg-gray-400 disabled:cursor-not-allowed"

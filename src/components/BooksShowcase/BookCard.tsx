@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimationOptions } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,17 +20,7 @@ interface BookCardProps {
 
 const cardVariants = {
   hidden: { opacity: 0, y: 50, scale: 0.95 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 120,
-      damping: 20,
-      delay: index * 0.1,
-    },
-  }),
+  visible: { opacity: 1, y: 0, scale: 1 },
   hover: {
     y: -8,
     scale: 1.02,
@@ -74,10 +64,15 @@ export const BookCard: React.FC<BookCardProps> = ({ book, index = 0 }) => {
   return (
     <motion.div
       variants={cardVariants}
-      custom={index}
       initial="hidden"
       animate="visible"
       whileHover="hover"
+      transition={{
+        type: "spring" as any,
+        stiffness: 120,
+        damping: 20,
+        delay: (index || 0) * 0.1,
+      }}
       className="group relative overflow-hidden rounded-xl border border-gray-200/20 bg-white/5 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300"
     >
       <Card className="border-0 bg-transparent h-full flex flex-col">

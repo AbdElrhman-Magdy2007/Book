@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { User, Shield } from "lucide-react";
@@ -9,6 +15,8 @@ import NavLinks from "./header/NavLinks";
 import AuthSection from "./header/AuthSection";
 import MobileMenuButton from "./header/MobileMenuButton";
 import { useSession } from "next-auth/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartShopping, faBookOpen } from "@fortawesome/free-solid-svg-icons";
 
 interface NavItem {
   name: string;
@@ -20,6 +28,7 @@ const Header: React.FC = React.memo(() => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [cartCount, setCartCount] = useState(0);
 
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 10);
@@ -53,11 +62,41 @@ const Header: React.FC = React.memo(() => {
 
   const { data: session } = useSession();
 
+  // Fetch cart count
+  useEffect(() => {
+    async function fetchCartCount() {
+      try {
+        const res = await fetch("/api/cart");
+        if (!res.ok) return;
+        const items = await res.json();
+        setCartCount(Array.isArray(items) ? items.length : 0);
+      } catch {}
+    }
+    fetchCartCount();
+    // Listen for cart updates
+    const handler = () => fetchCartCount();
+    window.addEventListener("cart-updated", handler);
+    return () => window.removeEventListener("cart-updated", handler);
+  }, []);
+
   const navItems: NavItem[] = useMemo(() => {
     const items: NavItem[] = [
       { name: "Home", href: "/" },
       { name: "Menu", href: "/menu" },
-      { name: "Showcase", href: "/showcase" },
+      {
+        name: "cart",
+        href: "/cart",
+        icon: (
+          <span className="relative inline-block">
+            <FontAwesomeIcon icon={faCartShopping} className="w-5 h-5" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 shadow-lg border-2 border-indigo-950 min-w-[20px] text-center">
+                {cartCount}
+              </span>
+            )}
+          </span>
+        ),
+      },
     ];
     if (session?.user) {
       if (session.user.role === "ADMIN") {
@@ -74,7 +113,7 @@ const Header: React.FC = React.memo(() => {
       }
     }
     return items;
-  }, [session]);
+  }, [session, cartCount]);
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },

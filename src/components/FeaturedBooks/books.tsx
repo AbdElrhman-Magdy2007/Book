@@ -9,6 +9,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping, faBookOpen } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { UilBooks } from "@iconscout/react-unicons";
+import { useToast } from "@/hooks/use-toast";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Animation variants
 const containerVariants = {
@@ -42,6 +45,7 @@ interface Book {
   image?: string;
   description?: string;
   order?: number;
+  category?: { name: string };
 }
 
 const PriceTag: React.FC<{ price: string }> = ({ price }) => (
@@ -64,6 +68,12 @@ export default function BooksSection() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cartStatus, setCartStatus] = useState<{
+    [id: string]: "idle" | "loading" | "success";
+  }>({});
+  const [cartItems, setCartItems] = useState<string[]>([]); // product ids in cart
+  const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     setLoading(true);
@@ -78,6 +88,18 @@ export default function BooksSection() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Fetch cart items on mount
+  useEffect(() => {
+    fetch("/api/cart")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCartItems(data.map((item) => item.productId));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Sort books by 'order' field if present
   const sortedBooks = [...books].sort((a, b) => {
     if (typeof a.order === "number" && typeof b.order === "number") {
@@ -88,6 +110,47 @@ export default function BooksSection() {
 
   // Limit to 6 products only
   const displayedBooks = sortedBooks.slice(0, 6);
+
+  // Add to Cart handler (send all required fields to API)
+  const handleAddToCart = async (book: Book) => {
+    setCartStatus((prev) => ({ ...prev, [book.id]: "loading" }));
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: book.id,
+          name: book.name,
+          image: book.image,
+          price: book.price,
+          category: book.category?.name,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to add to cart");
+      }
+      setCartStatus((prev) => ({ ...prev, [book.id]: "success" }));
+      setCartItems((prev) => [...prev, book.id]);
+      toast({
+        title: "Added to Cart!",
+        description: `${book.name} has been added to your cart.`,
+        status: "success",
+      });
+      setTimeout(
+        () => setCartStatus((prev) => ({ ...prev, [book.id]: "idle" })),
+        2000
+      );
+    } catch (err) {
+      setCartStatus((prev) => ({ ...prev, [book.id]: "idle" }));
+      toast({
+        title: "Error",
+        description:
+          err instanceof Error ? err.message : "Could not add to cart.",
+        status: "error",
+      });
+    }
+  };
 
   return (
     <section className="bg-white dark:bg-zinc-950 py-20 px-4 sm:px-6 lg:px-8 min-h-screen">
@@ -206,15 +269,70 @@ export default function BooksSection() {
                       {/* Buttons container always at the bottom */}
                       <div className="mt-8 flex justify-between gap-4 z-20">
                         <motion.button
-                          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-5 py-2.5 rounded-xl border border-indigo-800 shadow-lg hover:shadow-[0_8px_16px_rgba(79,70,229,0.3)] hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200 font-bold text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                          className={`flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:bg-gray-400 disabled:cursor-not-allowed
+                            border-transparent shadow-lg transition-all duration-200
+                            relative overflow-hidden
+                            before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-teal-400 before:to-indigo-500 before:opacity-0 before:transition-opacity before:duration-300
+                            hover:before:opacity-30
+                            ${
+                              cartStatus[book.id] === "success"
+                                ? "bg-green-600 border-green-400 shadow-green-400/40"
+                                : ""
+                            }
+                          `}
+                          style={{ zIndex: 1 }}
+                          whileHover={{ scale: 1.07 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={async () => {
+                            if (
+                              cartStatus[book.id] === "loading" ||
+                              cartItems.includes(book.id)
+                            )
+                              return;
+                            await handleAddToCart(book);
+                          }}
+                          disabled={
+                            cartStatus[book.id] === "loading" ||
+                            cartItems.includes(book.id)
+                          }
                         >
-                          <FontAwesomeIcon
-                            icon={faCartShopping}
-                            className="w-5 h-5"
-                          />
-                          Add to Cart
+                          {/* Loading Spinner */}
+                          {cartStatus[book.id] === "loading" ? (
+                            <Loader2 className="animate-spin w-5 h-5" />
+                          ) : cartStatus[book.id] === "success" ||
+                            cartItems.includes(book.id) ? (
+                            <motion.span
+                              initial={{ scale: 0.8, opacity: 0.7 }}
+                              animate={{ scale: [1.2, 1], opacity: 1 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 10,
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <CheckCircle className="w-5 h-5 text-white drop-shadow-[0_0_8px_#22c55e]" />
+                              Added
+                            </motion.span>
+                          ) : (
+                            <>
+                              <motion.span
+                                initial={false}
+                                animate={{
+                                  scale: [1, 1.15, 1],
+                                  rotate: [0, -10, 0],
+                                }}
+                                transition={{ duration: 0.4 }}
+                                className="flex items-center"
+                              >
+                                <FontAwesomeIcon
+                                  icon={faCartShopping}
+                                  className="w-5 h-5"
+                                />
+                              </motion.span>
+                              Add to Cart
+                            </>
+                          )}
                         </motion.button>
                         <motion.button
                           className="flex-1 flex items-center justify-center gap-2 bg-gray-200 dark:bg-zinc-700 text-indigo-800 dark:text-indigo-100 px-5 py-2.5 rounded-xl border border-gray-300 dark:border-zinc-600 shadow-lg hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:bg-gray-300 dark:hover:bg-zinc-600 transition-all duration-200 font-bold text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:bg-gray-400 disabled:cursor-not-allowed"

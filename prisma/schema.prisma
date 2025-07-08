@@ -182,3 +182,13 @@ model VerificationRequest {
   @@unique([identifier, token]) // Unique identifier-token pair
   @@index([identifier]) // Index for identifier-based queries
 }
+
+model CartItem {
+  id        String   @id @default(uuid())
+  productId String
+  name      String
+  image     String?
+  price     Float
+  category  String?
+  createdAt DateTime @default(now())
+}

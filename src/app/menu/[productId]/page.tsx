@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartShopping, faBookOpen } from "@fortawesome/free-solid-svg-icons";
+import { useToast } from "@/components/ui/use-toast";
+import { CheckCircle } from "lucide-react";
 
 interface Product {
   id: string;
@@ -80,6 +84,79 @@ export default function ProductDetailsPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { toast } = useToast();
+  const router = useRouter();
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  // Check if product is already in cart on mount
+  useEffect(() => {
+    async function checkIfAdded() {
+      if (!productId) return;
+      try {
+        const res = await fetch("/api/cart");
+        if (!res.ok) return;
+        const items = await res.json();
+        if (
+          Array.isArray(items) &&
+          items.some((item) => item.productId === productId)
+        ) {
+          setAdded(true);
+        }
+      } catch {}
+    }
+    checkIfAdded();
+  }, [productId]);
+
+  async function addToCart(product: Product) {
+    if (!product || adding || added) return;
+    setAdding(true);
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product.id, // use productId to match API
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          category: product.category,
+        }),
+      });
+      if (res.status === 201) {
+        toast({
+          title: "Added to Cart",
+          description: `${product.name} has been added to your cart!`,
+          variant: "default",
+        });
+        setAdded(true);
+        // Notify other components/pages to refresh cart
+        window.dispatchEvent(new Event("cart-updated"));
+      } else if (res.status === 409) {
+        toast({
+          title: "Already in Cart",
+          description: "This product is already in your cart.",
+          variant: "default",
+        });
+        setAdded(true);
+      } else {
+        const data = await res.json();
+        toast({
+          title: "Error",
+          description: data.error || "Failed to add to cart.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add to cart.",
+        variant: "destructive",
+      });
+    } finally {
+      setAdding(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchProduct() {
@@ -216,28 +293,39 @@ export default function ProductDetailsPage() {
             )}
 
             {product.url && (
-              <a
-                href={product.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              <button
+                disabled={product.price === 0 || adding || added}
+                className={`group relative inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-500 to-indigo-700 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-60 disabled:cursor-not-allowed ${
+                  product.price === 0 || adding || added
+                    ? "pointer-events-none"
+                    : ""
+                }`}
+                onClick={() => {
+                  addToCart(product);
+                }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 text-white transition-transform duration-300 group-hover:translate-y-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
-                  />
-                </svg>
-                <span className="tracking-wide">Download Book</span>
-              </a>
+                {added ? (
+                  <>
+                    <CheckCircle className="w-5 h-5 text-white drop-shadow-[0_0_8px_#22c55e] mr-2" />
+                    <span className="tracking-wide">Added</span>
+                  </>
+                ) : adding ? (
+                  <span className="tracking-wide">Adding...</span>
+                ) : (
+                  <>
+                    <FontAwesomeIcon
+                      icon={faCartShopping}
+                      className="w-5 h-5"
+                    />
+                    <span className="tracking-wide">Add to Cart</span>
+                  </>
+                )}
+                {product.price === 0 && (
+                  <span className="absolute -top-3 -right-3 bg-indigo-400 text-xs text-black px-2 py-0.5 rounded-full shadow">
+                    Free
+                  </span>
+                )}
+              </button>
             )}
           </div>
 

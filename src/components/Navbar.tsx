@@ -11,7 +11,7 @@ import { Menu, X } from 'lucide-react';
 const navItems = [
   { name: 'Home', href: '/' },
   { name: 'Menu', href: '/menu' },
-  { name: 'Showcase', href: '/showcase' },
+  { name: 'cart', href: '/cart' },
 ];
 
 export default function Navbar() {
