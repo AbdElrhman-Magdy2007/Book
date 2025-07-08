@@ -338,7 +338,10 @@ const BookCard: React.FC<{ book: any; index: number }> = ({ book, index }) => {
                   "Adding..."
                 ) : (
                   <>
-                    <FontAwesomeIcon icon={faCartShopping} className="w-5 h-5" />
+                    <FontAwesomeIcon
+                      icon={faCartShopping}
+                      className="w-5 h-5"
+                    />
                     Add to Cart
                   </>
                 )}

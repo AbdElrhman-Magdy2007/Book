@@ -184,11 +184,15 @@ model VerificationRequest {
 }
 
 model CartItem {
-  id        String   @id @default(uuid())
-  productId String
-  name      String
-  image     String?
-  price     Float
-  category  String?
-  createdAt DateTime @default(now())
+  id             String   @id @default(uuid())
+  userId         String?  // For logged-in users
+  guestSessionId String?  // For guests
+  productId      String
+  name           String
+  image          String?
+  price          Float
+  category       String?
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([guestSessionId])
 }

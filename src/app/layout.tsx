@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/ui/Header";
 import NextAuthSessionProvider from "./providers/NextAuthSessionProvider";
 import { Toaster } from "sonner";
+import EnsureGuestSession from "@/components/EnsureGuestSession";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black `}
       >
+        <EnsureGuestSession />
         <NextAuthSessionProvider>
           {/* <Navbar /> */}
           <Header />

@@ -113,6 +113,8 @@ export default function BooksSection() {
 
   // Add to Cart handler (send all required fields to API)
   const handleAddToCart = async (book: Book) => {
+    if (cartStatus[book.id] === "loading" || cartItems.includes(book.id))
+      return;
     setCartStatus((prev) => ({ ...prev, [book.id]: "loading" }));
     try {
       const res = await fetch("/api/cart", {
@@ -137,6 +139,8 @@ export default function BooksSection() {
         description: `${book.name} has been added to your cart.`,
         status: "success",
       });
+      // تحديث عدد المنتجات في الهيدر إذا كان هناك حدث مخصص
+      window.dispatchEvent(new Event("cart-updated"));
       setTimeout(
         () => setCartStatus((prev) => ({ ...prev, [book.id]: "idle" })),
         2000
@@ -284,11 +288,6 @@ export default function BooksSection() {
                           whileHover={{ scale: 1.07 }}
                           whileTap={{ scale: 0.97 }}
                           onClick={async () => {
-                            if (
-                              cartStatus[book.id] === "loading" ||
-                              cartItems.includes(book.id)
-                            )
-                              return;
                             await handleAddToCart(book);
                           }}
                           disabled={
