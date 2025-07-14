@@ -24,7 +24,7 @@ const cardVariants = {
   hover: {
     y: -8,
     scale: 1.02,
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3, ease: "easeOut" as const },
   },
 };
 

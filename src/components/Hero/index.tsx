@@ -12,19 +12,19 @@ import { UilBooks } from "@iconscout/react-unicons";
 const images = [
   {
     id: 1,
-    img: "https://i.pinimg.com/736x/f4/89/a0/f489a0b2c574d719b316efa9aa60d973.jpg",
+    img: "https://i.postimg.cc/sx3ZDmCS/Chat-GPT-Image-Jul-11-2025-09-34-52-PM.png",
   },
   {
     id: 2,
-    img: "https://i.pinimg.com/736x/6c/77/e6/6c77e673ea5bba9155afbcbe8d1495f5.jpg",
+    img: "https://i.postimg.cc/yYQSs0Qg/Chat-GPT-Image-Jul-12-2025-11-36-35-AM.png",
   },
   {
     id: 3,
-    img: "https://i.pinimg.com/736x/d9/20/78/d920781ff2d583d02f86cc61d42291ae.jpg",
+    img: "https://i.postimg.cc/kGWwLfFb/Chat-GPT-Image-Jul-12-2025-02-47-45-PM.pngz",
   },
   {
     id: 4,
-    img: "https://i.pinimg.com/736x/cf/8b/ef/cf8befc70db00a64d88d9c082b4d9158.jpg",
+    img: "https://i.postimg.cc/DZXcbBNM/Chat-GPT-Image-Jul-11-2025-12-10-31-PM.png",
   },
 ];
 

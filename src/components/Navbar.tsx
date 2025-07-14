@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
-import clsx from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 
 const navItems = [
-  { name: 'Home', href: '/' },
-  { name: 'Menu', href: '/menu' },
-  { name: 'cart', href: '/cart' },
+  { name: "Home", href: "/" },
+  { name: "Menu", href: "/menu" },
+  { name: "cart", href: "/cart" },
 ];
 
 export default function Navbar() {
@@ -20,11 +20,12 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-6xl bg-indigo-950/70 backdrop-blur-md border border-indigo-800 px-6 py-3 rounded-full shadow-lg flex items-center justify-between">
-
       {/* Left: Logo */}
       <Link href="/" className="flex items-center gap-2">
         <Image src="/logo.svg" alt="Logo" width={28} height={28} />
-        <span className="text-indigo-100 font-semibold text-sm">YourBrand</span>
+        <span className="text-indigo-100 font-semibold text-sm tracking-wider">
+          Inkspire
+        </span>
       </Link>
 
       {/* Center: Links (hidden on mobile) */}
@@ -36,9 +37,9 @@ export default function Navbar() {
               <Link
                 href={item.href}
                 className={clsx(
-                  'text-sm font-medium transition-colors duration-200',
-                  isActive ? 'text-white' : 'text-indigo-300 hover:text-white',
-                  'flex items-center gap-1'
+                  "text-sm font-medium transition-colors duration-200",
+                  isActive ? "text-white" : "text-indigo-300 hover:text-white",
+                  "flex items-center gap-1"
                 )}
               >
                 {isActive && <span className="text-white text-lg">•</span>}

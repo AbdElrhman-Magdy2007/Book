@@ -105,7 +105,7 @@ export default function Footer() {
             viewport={{ once: true }}
             className="footer-title text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white mb-4"
           >
-            ReadFlow<span className="text-indigo-400">.</span>
+            Inkspire<span className="text-indigo-400">.</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -115,8 +115,8 @@ export default function Footer() {
             className="footer-text text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-xs"
           >
             Discover curated digital books that inspire your mind and elevate
-            your thinking — with beautiful design, instant access, and full
-            ownership.
+            your thinking — Welcome to Inkspire, where inspiration meets
+            innovation.
           </motion.p>
         </div>
 

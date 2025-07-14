@@ -142,45 +142,59 @@ const BookCard: React.FC<{ book: any; index: number }> = ({ book, index }) => {
     const halfStar = rating % 1 >= 0.5;
     const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
     return (
-      <div className="flex items-center gap-0.5">
+      <div
+        className="inline-flex items-center gap-1 px-4 py-1 rounded-full bg-gradient-to-r from-yellow-50 via-indigo-50 to-indigo-100 dark:from-zinc-800 dark:via-zinc-900 dark:to-indigo-900/80 shadow-md border border-yellow-100/40 dark:border-zinc-700/40 backdrop-blur-sm transition-all duration-300"
+        aria-label={`Rating: ${book.rating} out of 5`}
+      >
         {Array.from({ length: fullStars }).map((_, i) => (
           <svg
             key={"full-" + i}
-            className="w-5 h-5 text-yellow-400 drop-shadow-sm"
-            fill="currentColor"
+            className="w-6 h-6 drop-shadow-lg transition-transform duration-200 hover:scale-110 hover:drop-shadow-[0_0_12px_#facc15] cursor-pointer"
             viewBox="0 0 20 20"
+            fill="url(#star-gradient)"
           >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" />
+            <defs>
+              <linearGradient id="star-gradient" x1="0" y1="0" x2="20" y2="20">
+                <stop offset="0%" stopColor="#facc15" />
+                <stop offset="100%" stopColor="#fbbf24" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"
+              fill="url(#star-gradient)"
+            />
           </svg>
         ))}
         {halfStar && (
           <svg
-            className="w-5 h-5 text-yellow-400 drop-shadow-sm"
-            fill="currentColor"
+            className="w-6 h-6 drop-shadow-lg transition-transform duration-200 hover:scale-110 hover:drop-shadow-[0_0_12px_#facc15] cursor-pointer"
             viewBox="0 0 20 20"
           >
             <defs>
-              <linearGradient id="half">
+              <linearGradient id="half-star-gradient">
                 <stop offset="50%" stopColor="#facc15" />
                 <stop offset="50%" stopColor="#e5e7eb" />
               </linearGradient>
             </defs>
             <path
               d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"
-              fill="url(#half)"
+              fill="url(#half-star-gradient)"
             />
           </svg>
         )}
         {Array.from({ length: emptyStars }).map((_, i) => (
           <svg
             key={"empty-" + i}
-            className="w-5 h-5 text-gray-300"
+            className="w-6 h-6 text-gray-300 drop-shadow-md transition-transform duration-200 hover:scale-110 cursor-pointer"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" />
           </svg>
         ))}
+        <span className="ml-2 text-xs font-bold text-yellow-600">
+          {book.rating.toFixed(1)}
+        </span>
       </div>
     );
   };
@@ -252,11 +266,9 @@ const BookCard: React.FC<{ book: any; index: number }> = ({ book, index }) => {
   return (
     <div className="relative group">
       {/* Stars at the top */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-4 z-20 flex items-center bg-white/90 dark:bg-zinc-900/90 px-3 py-1 rounded-full shadow backdrop-blur border border-gray-200 dark:border-zinc-700">
+      <div >
         {renderStars(book.rating)}
-        <span className="ml-2 text-xs font-bold text-yellow-600">
-          {book.rating.toFixed(1)}
-        </span>
+      
       </div>
       <motion.div
         variants={cardVariants}

@@ -12,6 +12,7 @@ import { UilBooks } from "@iconscout/react-unicons";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import StarRating from "@/components/ui/StarRating";
 
 // Animation variants
 const containerVariants = {
@@ -46,6 +47,7 @@ interface Book {
   description?: string;
   order?: number;
   category?: { name: string };
+  rating?: number; // Added for star rating
 }
 
 const PriceTag: React.FC<{ price: string }> = ({ price }) => (
@@ -206,6 +208,23 @@ export default function BooksSection() {
                   exit={{ opacity: 0, y: 20 }}
                   className="flex flex-col h-full"
                 >
+                  {/* نجوم التقييم خارج الكرت مع خلفية جذابة */}
+                  <motion.div
+                    className="mb-2 flex items-center justify-center"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    <span
+                      className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-gradient-to-r from-yellow-100 via-yellow-50 to-indigo-100 dark:from-zinc-800 dark:via-zinc-900 dark:to-indigo-900 shadow-md border border-yellow-200/60 dark:border-zinc-700/60"
+                      style={{ minWidth: 90 }}
+                    >
+                      <StarRating rating={book.rating ?? 4.5} />
+                      <span className="text-indigo-600 dark:text-indigo-300 font-semibold text-base ml-1">
+                        {(book.rating ?? 4.5).toFixed(1)}
+                      </span>
+                    </span>
+                  </motion.div>
                   <CardContainer
                     className="inter-var flex-1"
                     containerClassName="hover:scale-[1.04] transition-transform duration-500 ease-out w-full max-w-sm mx-auto"
@@ -240,14 +259,19 @@ export default function BooksSection() {
                             whileHover={{ scale: 1.05 }}
                             transition={{ duration: 0.3, ease: "easeOut" }}
                           >
-                            <Image
-                              src={book.image || "/placeholder-book.jpg"}
-                              alt={book.name}
-                              width={700}
-                              height={500}
-                              className="w-full object-contain max-h-[200px] sm:max-h-[240px] lg:max-h-[280px] transition-all duration-300"
-                              loading="lazy"
-                            />
+                            <Link
+                              href={`/menu/${book.id}`}
+                              className="flex items-center gap-2 w-full h-full justify-center"
+                            >
+                              <Image
+                                src={book.image || "/placeholder-book.jpg"}
+                                alt={book.name}
+                                width={700}
+                                height={500}
+                                className="w-full object-contain max-h-[200px] sm:max-h-[240px] lg:max-h-[280px] transition-all duration-300"
+                                loading="lazy"
+                              />
+                            </Link>
                             <PriceTag
                               price={
                                 typeof book.price === "number"
