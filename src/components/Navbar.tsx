@@ -24,7 +24,7 @@ export default function Navbar() {
       <Link href="/" className="flex items-center gap-2">
         <Image src="/logo.svg" alt="Logo" width={28} height={28} />
         <span className="text-indigo-100 font-semibold text-sm tracking-wider">
-          Inkspire
+          Nibtale
         </span>
       </Link>
 

@@ -14,11 +14,11 @@ export const dynamic = "force-dynamic";
 
 // Metadata for SEO
 export const metadata: Metadata = {
-  title: "Profile | Book Landing",
+  title: "Profile | Nibtale",
   description: "Manage your account details and preferences",
   keywords: ["profile", "account", "settings", "user"],
   openGraph: {
-    title: "Profile | Book Landing",
+    title: "Profile | Nibtale",
     description: "Manage your account details and preferences",
     type: "website",
   },

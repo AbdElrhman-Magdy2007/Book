@@ -20,9 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Inkspire",
+  title: "Nibtale",
   description:
-    "Inkspire - Discover, read, and get inspired by curated digital books in a beautiful, modern experience.",
+    "Nibtale - Discover, read, and get inspired by curated digital books in a beautiful, modern experience.",
 };
 
 export default function RootLayout({

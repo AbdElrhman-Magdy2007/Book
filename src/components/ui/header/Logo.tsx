@@ -33,18 +33,18 @@ const Logo: React.FC = () => {
         <img
           src="https://i.postimg.cc/YS96n7FT/Chat-GPT-Image-Jul-11-2025-03-55-44-PM.png"
           className="w-12 h-12 md:w-16 md:h-16 rounded-full shadow-lg border-2 transition-transform duration-300 group-hover:scale-110 group-hover:shadow-2xl object-cover bg-indigo-600"
-          alt="Inkspire Logo"
+          alt="Nibtale Logo"
         />
         <span className="ml-2 flex items-center space-x-1">
-        {["I", "n", "k", "s", "p", "i", "r", "e"].map((letter, index) => (
-          <motion.span
-            key={`name-${index}`}
-            className="text-primary animate-glow"
-            variants={letterVariants}
-          >
-            {letter}
-          </motion.span>
-        ))}
+          {["N", "i", "b", "t", "a", "l", "e"].map((letter, index) => (
+            <motion.span
+              key={`name-${index}`}
+              className="text-primary animate-glow"
+              variants={letterVariants}
+            >
+              {letter}
+            </motion.span>
+          ))}
         </span>
       </h1>
     </motion.a>
