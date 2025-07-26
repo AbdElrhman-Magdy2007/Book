@@ -39,7 +39,7 @@ const Hero = () => {
   }, []);
 
   const cardSize = isMobile
-    ? { width: 220, height: 300 }
+    ? { width: 170, height: 270 }
     : { width: 300, height: 400 };
 
   const handleAnimationComplete = () => {
