@@ -114,15 +114,19 @@ const TextField = memo(
       ref
     ) => {
       const displayLabel = label || name;
-      const defaultVal = defaultValue?.toString() || "";
+      
+      // Use controlled input if value is provided, otherwise use uncontrolled with defaultValue
+      const isControlled = value !== undefined;
+      const inputValue = isControlled ? value : undefined;
+      const inputDefaultValue = !isControlled ? (defaultValue?.toString() || "") : undefined;
 
       return (
         <div
           className={clsx(
-            "form-field space-y-2 text-indigo-700", // إضافة margin-top: 50px هنا
+            "form-field space-y-2 text-indigo-700",
             {
-              "text-right": isArabic, // لضمان محاذاة النص يمينًا في RTL
-              "text-left": !isArabic, // محاذاة يسارًا في LTR
+              "text-right": isArabic,
+              "text-left": !isArabic,
             }
           )}
           dir={isArabic ? "rtl" : "ltr"}
@@ -144,8 +148,7 @@ const TextField = memo(
             placeholder={placeholder}
             disabled={disabled}
             autoFocus={autoFocus}
-            value={value}
-            defaultValue={defaultVal}
+            {...(isControlled ? { value: inputValue } : { defaultValue: inputDefaultValue })}
             onChange={onChange}
             readOnly={readOnly}
             aria-invalid={!!error}
@@ -153,9 +156,9 @@ const TextField = memo(
             className={clsx(
               "block w-full px-4 py-2 border rounded-lg transition-all focus:ring-2 focus:ring-offset-2",
               {
-                "border-red-500 focus:ring-red-500": error, // لون أحمر عند الخطأ
-                "border-indigo-500 focus:ring-indigo-500 dark:border-indigo-500 dark:focus:ring-indigo-400": !error, // لون عادي
-                "bg-gray-100 cursor-not-allowed dark:bg-indigo-500": disabled || readOnly, // حالة معطلة
+                "border-red-500 focus:ring-red-500": error,
+                "border-indigo-500 focus:ring-indigo-500 dark:border-indigo-500 dark:focus:ring-indigo-400": !error,
+                "bg-gray-100 cursor-not-allowed dark:bg-indigo-500": disabled || readOnly,
               }
             )}
           />

@@ -54,6 +54,13 @@ export async function POST(req: Request) {
     const cartItem = await db.cartItem.create({ data });
     return NextResponse.json(cartItem, { status: 201 });
   } catch (error) {
+    console.error('Database operation failed in POST /api/cart:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      endpoint: 'POST /api/cart',
+    });
+
     return NextResponse.json(
       { error: "Failed to add to cart" },
       { status: 500 }
@@ -80,6 +87,13 @@ export async function GET(req: Request) {
     });
     return NextResponse.json(items);
   } catch (error) {
+    console.error('Database query failed in GET /api/cart:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      endpoint: 'GET /api/cart',
+    });
+
     return NextResponse.json(
       { error: "Failed to fetch cart" },
       { status: 500 }
@@ -120,6 +134,13 @@ export async function DELETE(req: Request) {
     }
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Database operation failed in DELETE /api/cart:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      endpoint: 'DELETE /api/cart',
+    });
+
     return NextResponse.json(
       { error: "Failed to remove from cart" },
       { status: 500 }

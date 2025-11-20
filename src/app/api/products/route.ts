@@ -12,12 +12,17 @@ export async function GET() {
     });
     return NextResponse.json(products);
   } catch (error) {
-    console.error("[API /products] Error fetching products:", error);
+    // Structured error logging for debugging
+    console.error('Database query failed in /api/products:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      endpoint: '/api/products',
+    });
+
+    // Return user-friendly error without exposing internals
     return NextResponse.json(
-      {
-        error: "Failed to fetch products",
-        details: error instanceof Error ? error.message : String(error),
-      },
+      { error: 'Failed to fetch products' },
       { status: 500 }
     );
   }

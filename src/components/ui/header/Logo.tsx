@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const Logo: React.FC = () => {
@@ -23,12 +24,11 @@ const Logo: React.FC = () => {
   };
 
   return (
-    <motion.a
-      href="/"
-      className="flex items-center gap-3 group"
-      variants={logoVariants}
-      style={{ textDecoration: "none" }}
-    >
+    <Link href="/" style={{ textDecoration: "none" }}>
+      <motion.div
+        className="flex items-center gap-3 group"
+        variants={logoVariants}
+      >
       <h1 className="flex items-center md:text-3xl text-xl font-extrabold font-heading tracking-tight select-none">
         <img
           src="https://i.postimg.cc/YS96n7FT/Chat-GPT-Image-Jul-11-2025-03-55-44-PM.png"
@@ -47,7 +47,8 @@ const Logo: React.FC = () => {
         ))}
         </span>
       </h1>
-    </motion.a>
+    </motion.div>
+    </Link>
   );
 };
 

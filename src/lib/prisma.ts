@@ -1,51 +1,49 @@
-// import { PrismaClient } from "@prisma/client";
+/**
+ * Prisma Client Configuration
+ * 
+ * Optimized for Next.js serverless functions with the following features:
+ * - Singleton pattern to prevent multiple instances in development
+ * - Lazy connection (connects on first query, not on import)
+ * - Environment-based logging (verbose in dev, errors only in production)
+ * - Proper connection pooling for serverless environments
+ */
 
-// const globalForPrisma = global as unknown as { prisma?: PrismaClient };
-
-// export const db = globalForPrisma.prisma || new PrismaClient();
-
-// if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
-
-// export const prisma = new PrismaClient();
-
-// src/lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
 
-// Declare a global variable to prevent multiple PrismaClient instances
+// Declare global variable to store Prisma instance across hot reloads in development
 declare global {
   // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 
-// Use existing PrismaClient instance or create a new one
-export const db: PrismaClient =
-  globalThis.prisma ||
-  new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'], // Enable logging for debugging
+/**
+ * Creates a new PrismaClient instance with optimized configuration
+ * 
+ * Why lazy connection?
+ * - Serverless functions should connect on-demand, not eagerly
+ * - Reduces cold start time
+ * - Prisma automatically manages connection lifecycle
+ */
+const prismaClientSingleton = () => {
+  return new PrismaClient({
+    // Environment-based logging: detailed in dev, minimal in production
+    log: process.env.NODE_ENV === 'development' 
+      ? ['query', 'error', 'warn'] 
+      : ['error'],
   });
+};
 
-if (process.env.NODE_ENV !== 'production') globalThis.prisma = db;
+/**
+ * Global Prisma instance
+ * 
+ * In development: reuse the same instance across hot reloads
+ * In production: create a new instance for each serverless function invocation
+ */
+export const db: PrismaClient = globalThis.prisma ?? prismaClientSingleton();
 
-// Test the connection and handle errors
-db.$connect()
-  .then(() => console.log('✅ Prisma connected successfully'))
-  .catch((error) => {
-    console.error('❌ Prisma connection failed:', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString(),
-    });
-    // Throw the error to prevent silent failures
-    throw error;
-  });
+// Store instance globally in development to prevent multiple instances
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = db;
+}
 
 export default db;
-
-
-// // src/lib/prisma.ts
-// import { PrismaClient } from "@prisma/client";
-
-// const globalForPrisma = global as unknown as { prisma?: PrismaClient };
-
-// export const db = globalForPrisma.prisma || new PrismaClient();
-
-// if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;

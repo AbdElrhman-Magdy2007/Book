@@ -384,15 +384,15 @@ export default function BooksSection() {
       </div>
       {/* زر الانتقال إلى صفحة القائمة */}
       <div className="flex justify-center mt-12">
-        <Link href="/menu" passHref legacyBehavior>
-          <motion.a
+        <Link href="/menu">
+          <motion.button
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.97 }}
             className="inline-flex items-center gap-3 px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold text-lg shadow-lg border border-indigo-800 hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
           >
             <UilBooks className="w-5 h-5" />
             View Full Menu
-          </motion.a>
+          </motion.button>
         </Link>
       </div>
     </section>
